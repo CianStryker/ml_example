@@ -7,7 +7,9 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+
 library(fs)
+library(yardstick)
 library(tidymodels)
 library(tidyverse)
 
@@ -17,6 +19,7 @@ library(tidyverse)
 
 
 ```{r download, cache=TRUE}
+
 # Mostly the same code as Tuesday, but cleaned up. Do you understand what every
 # line does? If not, ask your partner!
 
@@ -44,6 +47,7 @@ file_delete(c("master.zip", "2018-live-poll-results-master"))
 ```
 
 ```{r clean}
+
 # Data is somewhat messy. Some of our functions require that the dependent
 # variable be a factor with two levels, rather than a simple 0/1 variable. Many
 # of the variables in the original data are missing for thousands of
@@ -69,6 +73,7 @@ clean <- raw_data %>%
 ```
 
 ```{r make_a_model}
+
 # Make a model and then add predictions from that model back to the original
 # data. We need the predictions and the original data together so that we can
 # evaluate how well our model does. We create two sorts of predictions: the raw
@@ -78,7 +83,9 @@ clean <- raw_data %>%
 # All of this is relatively simple because there is only one independent
 # variable in the model and the dependent variable only has two levels.
 
-model_1 <- glm(data = clean, dvote ~ gender, family = "binomial")
+model_1 <- glm(data = clean, dvote ~ gender + party, family = "binomial")
+
+summary(model_1)
 
 x_1 <- clean %>% 
   mutate(prediction = predict(model_1, type = "response")) %>% 
@@ -88,4 +95,7 @@ x_1 <- clean %>%
 
 
 
+```{r}
+metrics(x_1, truth = dvote, estimate = pred_dvote)
+```
 
